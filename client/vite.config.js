@@ -5,14 +5,20 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
-    cssMinify: 'esbuild'
+    cssMinify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   },
-  base: '/',
+  base: './',
   server: {
     proxy: {
       '/api': {
         target: process.env.VITE_API_URL || 'http://localhost:3001',
         changeOrigin: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
