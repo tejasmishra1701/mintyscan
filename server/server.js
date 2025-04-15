@@ -140,25 +140,21 @@ app.post('/api/mint-signature', async (req, res) => {
   }
 });
 
-// Add this new endpoint after your existing endpoints
+const RESET_KEY = 'mintyscan1234';
+
+// Add this new endpoint
 app.post('/api/reset-leaderboard', async (req, res) => {
   try {
-    const { adminKey } = req.body;
+    const { key } = req.body;
     
-    // Verify admin key matches environment variable
-    if (adminKey !== process.env.ADMIN_KEY) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (key !== RESET_KEY) {
+      return res.status(403).json({ error: 'Invalid reset key' });
     }
 
-    if (!db) {
-      throw new Error('Database connection not established');
-    }
-
-    // Clear all documents from the mints collection
+    // Reset the leaderboard in MongoDB
     await db.collection('mints').deleteMany({});
     
-    console.log('Leaderboard reset successfully');
-    res.json({ message: 'Leaderboard has been reset' });
+    res.json({ message: 'Leaderboard reset successfully' });
   } catch (error) {
     console.error('Error resetting leaderboard:', error);
     res.status(500).json({ error: 'Failed to reset leaderboard' });

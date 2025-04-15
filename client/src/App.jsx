@@ -200,66 +200,77 @@ function App() {
     </div>
   );
 
-  const MintingStatusScreen = () => (
-    <div className="flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-green-100 max-w-md w-full mx-auto">
-      <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-green-700 to-green-900 bg-clip-text text-transparent">Minting Status</h2>
+  const MintingStatusScreen = () => {
+    const refreshLeaderboard = () => {
+      // Force LeaderBoard component to refresh
+      setStep(2);
+    };
 
-      {mintStatus === 'minting' && (
-        <div className="text-center space-y-6">
-          <p className="text-gray-600 text-lg">Minting in progress...</p>
-          <div className="loader w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
-        </div>
-      )}
+    return (
+      <div className="flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm p-10 rounded-3xl shadow-2xl border border-green-100 max-w-md w-full mx-auto">
+        <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-green-700 to-green-900 bg-clip-text text-transparent">Minting Status</h2>
 
-      {mintStatus === 'success' && (
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 mx-auto bg-green-200 rounded-full flex items-center justify-center mb-6">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+        {mintStatus === 'minting' && (
+          <div className="text-center space-y-6">
+            <p className="text-gray-600 text-lg">Minting in progress...</p>
+            <div className="loader w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
           </div>
-          <h3 className="text-2xl font-bold text-green-700">Success {userId}!</h3>
-          <div className="p-6 bg-gray-50 rounded-2xl space-y-3">
-            <p className="text-gray-600">Token deposited in your account</p>
-            <p className="text-lg font-semibold text-green-600">{mintAmount} TAC</p>
+        )}
+
+        {mintStatus === 'success' && mintAmount && (
+          <div className="text-center space-y-6">
+            <div className="w-16 h-16 mx-auto bg-green-200 rounded-full flex items-center justify-center mb-6">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-green-700">Success {userId}!</h3>
+            <div className="p-6 bg-gray-50 rounded-2xl space-y-3">
+              <p className="text-gray-600">Token deposited in your account</p>
+              <p className="text-lg font-semibold text-green-600">{mintAmount} TAC</p>
+              <p className="text-sm text-gray-500">User ID: {userId}</p>
+            </div>
+            {txHash && (
+              <a
+                href={`https://etherscan.io/tx/${txHash}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block px-6 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors duration-200"
+              >
+                View on Etherscan
+              </a>
+            )}
+            <div className="mt-8 w-full">
+              <LeaderBoard onRefresh={refreshLeaderboard} />
+            </div>
           </div>
-          {txHash && (
-            <a
-              href={`https://etherscan.io/tx/${txHash}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block px-6 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors duration-200"
+        )}
+
+        {mintStatus === 'failed' && (
+          <div className="text-center space-y-6">
+            <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-6">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-red-600">Minting Failed</h3>
+            <p className="text-gray-600">
+              There was an error while minting your Token. Please try again later.
+            </p>
+            <button
+              onClick={() => {
+                setMintStatus('idle');
+                setStep(1);
+              }}
+              className="px-8 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transform hover:-translate-y-0.5 transition-all duration-200"
             >
-              View on Etherscan
-            </a>
-          )}
-          <div className="mt-12 w-full">
-            <LeaderBoard />
+              Try Again
+            </button>
           </div>
-        </div>
-      )}
-
-      {mintStatus === 'failed' && (
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-6">
-            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </div>
-          <h3 className="text-2xl font-bold text-red-600">Minting Failed</h3>
-          <p className="text-gray-600">
-            There was an error while minting your Token. Please try again later.
-          </p>
-          <button
-            onClick={() => setStep(1)}
-            className="px-8 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transform hover:-translate-y-0.5 transition-all duration-200"
-          >
-            Go Back
-          </button>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  };
 
   const renderStep = () => {
     switch (step) {
