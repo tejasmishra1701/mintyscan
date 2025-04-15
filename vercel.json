@@ -1,36 +1,31 @@
-// {
-//   "version": 2,
-//   "builds": [
-//     {
-//       "src": "client/package.json",
-//       "use": "@vercel/static-build",
-//       "config": {
-//         "distDir": "dist",
-//         "buildCommand": "cd client && npm install && npm run build"
-//       }
-//     },
-//     {
-//       "src": "server/server.js",
-//       "use": "@vercel/node"
-//     }
-//   ],
-//   "routes": [
-//     {
-//       "src": "/api/(.*)",
-//       "dest": "server/server.js"
-//     },
-//     {
-//       "src": "/(.*\\.[^/]*)",
-//       "dest": "/client/$1"
-//     },
-//     {
-//       "src": "/(.*)",
-//       "dest": "/client/index.html"
-//     }
-//   ],
-//   "env": {
-//     "MONGODB_URI": "mongodb://127.0.0.1:27017/mintyscan",
-//     "SIGNER_PRIVATE_KEY": "0x3daaf35c81caa4998c5081189a1e648eaf75ffcbdff4cd73d99084c273fa5cef",
-//     "ADMIN_KEY": "mintyscan1234"
-//   }
-// }
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "client/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist",
+                "buildCommand": "cd client && npm install && npm run build"
+            }
+        },
+        {
+            "src": "server/server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "server/server.js"
+        },
+        {
+            "src": "/(.*\\.[^/]*)",
+            "dest": "/client/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/client/index.html"
+        }
+    ]
+}
