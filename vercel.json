@@ -29,8 +29,8 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "SIGNER_PRIVATE_KEY": "@signer_private_key",
-    "adminKey": "@adminKey"
+    "MONGODB_URI": "mongodb://127.0.0.1:27017/mintyscan",
+    "SIGNER_PRIVATE_KEY": "0x3daaf35c81caa4998c5081189a1e648eaf75ffcbdff4cd73d99084c273fa5cef",
+    "ADMIN_KEY": "mintyscan1234"
   }
 }
