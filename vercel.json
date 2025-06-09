@@ -8,24 +8,6 @@
                 "distDir": "dist",
                 "buildCommand": "cd client && npm install --platform=linux --arch=x64 lightningcss && npm install && npm run build"
             }
-        },
-        {
-            "src": "server/server.js",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "server/server.js"
-        },
-        {
-            "src": "/(.*\\.[^/]*)",
-            "dest": "/client/$1"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/client/index.html"
         }
     ]
 }
