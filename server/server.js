@@ -1,41 +1,36 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const ethers = require('ethers');
 const dotenv = require('dotenv');
 const path = require('path');
-const { MongoClient } = require('mongodb');
 const { parseEther } = require('ethers');
+const ethers = require('ethers');
+// Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/mintyscan';
-
-let db;
-
-// MongoDB Connection
-async function connectToDatabase() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-    console.log('Connected to MongoDB successfully');
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
-}
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-}
+// Set strictQuery to false to prepare for Mongoose 7
+mongoose.set('strictQuery', false);
+
+// MongoDB Connection with error handling
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: 'mintyscan' // explicitly set database name
+})
+.then(() => {
+    console.log('Connected to MongoDB Atlas successfully');
+})
+.catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+});
 
 // Initialize signing wallet
 const PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY;
@@ -62,10 +57,6 @@ async function createSignature(recipient, amount, userId) {
 // Update the leaderboard endpoint
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    if (!db) {
-      throw new Error('Database connection not established');
-    }
-
     const leaderboardData = await db.collection('mints')
       .aggregate([
         {
@@ -163,16 +154,22 @@ app.post('/api/reset-leaderboard', async (req, res) => {
   }
 });
 
-// Catch-all for client-side routing in production
+// Static file serving for production
 if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../dist/index.html'));
-  });
+    app.use(express.static(path.join(__dirname, '../client/dist')));
+    app.get('/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    });
 }
 
-// Start server only after connecting to MongoDB
-connectToDatabase().then(() => {
-  app.listen(PORT, () => {
+// Error handling
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// Start server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-  });
 });
